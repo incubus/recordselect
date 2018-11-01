@@ -58,7 +58,7 @@ module RecordSelectHelper
     record_select_options.merge! options[:rs] if options[:rs]
 
     html = text_field_tag(name, nil, options.merge(:autocomplete => 'off', :onfocus => "this.focused=true", :onblur => "this.focused=false"))
-    url = url_for({:action => :browse, :controller => controller.controller_path}.merge(params))
+    url = url_for({:action => :browse, :controller => prepared_path(controller)}.merge(params))
     html << javascript_tag("new RecordSelect.Single(#{options[:id].to_json}, #{url.to_json}, #{record_select_options.to_json});")
 
     return html
@@ -91,7 +91,7 @@ module RecordSelectHelper
     record_select_options.merge! options[:rs] if options[:rs]
 
     html = text_field_tag(name, nil, options.merge(:autocomplete => 'off', :onfocus => "this.focused=true", :onblur => "this.focused=false"))
-    url = url_for({:action => :browse, :controller => controller.controller_path}.merge(params))
+    url = url_for({:action => :browse, :controller => prepared_path(controller) }.merge(params))
     html << javascript_tag("new RecordSelect.Autocomplete(#{options[:id].to_json}, #{url.to_json}, #{record_select_options.to_json});")
 
     return html
@@ -126,7 +126,7 @@ module RecordSelectHelper
     html << hidden_field_tag("#{name}[]", '', :id => nil)
     html << content_tag('ul', '', :class => 'record-select-list');
 
-    url = url_for({:action => :browse, :controller => controller.controller_path}.merge(params))
+    url = url_for({:action => :browse, :controller => prepared_path(controller)}.merge(params))
     html << javascript_tag("new RecordSelect.Multiple(#{options[:id].to_json}, #{url.to_json}, #{record_select_options.to_json});")
 
     return html
@@ -155,6 +155,11 @@ module RecordSelectHelper
   end
 
   private
+
+  def prepared_path(controller)
+    path = controller.controller_path
+    path.include?('/') ? "/#{path}" : path
+  end
 
   # uses renderer (defaults to record_select_config.label) to determine how the given record renders.
   def render_record_from_config(record, renderer = record_select_config.label)
